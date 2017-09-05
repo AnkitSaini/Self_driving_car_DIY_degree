@@ -363,6 +363,10 @@ def fit_lane_lines(image, left_lane_x, left_lane_y, right_lane_x, right_lane_y):
     two array. One for left and one for right side polynomial line coordinate that fit the pixels
     """
     y_coordinates = np.linspace(0, image.shape[0] - 1, image.shape[0])
+    if (len(right_lane_x) == 0 or len(right_lane_x) == 0) and (len(left_lane_x) == 0 or len(left_lane_x) == 0):
+        pts_left = []
+        pts_right = []
+        return pts_left, pts_right
     if len(right_lane_x) == 0 or len(right_lane_x) == 0:
         pts_left = lane_line_polyfit(y_coordinates, left_lane_y, left_lane_x)
         pts_right = []
@@ -370,10 +374,6 @@ def fit_lane_lines(image, left_lane_x, left_lane_y, right_lane_x, right_lane_y):
     elif len(left_lane_x) == 0 or len(left_lane_x) == 0:
         pts_left = []
         pts_right = lane_line_polyfit(y_coordinates, right_lane_y, right_lane_x)
-        return pts_left, pts_right
-    if (len(right_lane_x) == 0 or len(right_lane_x) == 0) and (len(left_lane_x) == 0 or len(left_lane_x) == 0):
-        pts_left = []
-        pts_right = []
         return pts_left, pts_right
     else:
         pts_left = lane_line_polyfit(y_coordinates, left_lane_y, left_lane_x)
@@ -387,12 +387,12 @@ def draw_lane_lines(original_image, binary_warped_image, left_pts, right_pts):
     """
     lane_lines = np.zeros((binary_warped_image.shape[0], binary_warped_image.shape[1], 3), dtype='uint8')
     # Drawing the lane lines on the colored warped image
-    if len(left_pts) == 0:
+    if len(left_pts) == 0 and len(right_pts) == 0:
+        pass
+    elif len(left_pts) == 0:
         cv2.polylines(lane_lines, [right_pts], isClosed=False, color=(0, 0, 255), thickness=15)
     elif len(right_pts) == 0:
         cv2.polylines(lane_lines, [left_pts], isClosed=False, color=(0, 0, 255), thickness=15)
-    elif len(left_pts) == 0 and len(right_pts) == 0:
-        pass
     else:
         cv2.polylines(lane_lines, [left_pts], isClosed=False, color=(0, 0, 255), thickness=15)
         cv2.polylines(lane_lines, [right_pts], isClosed=False, color=(0, 0, 255), thickness=15)
